@@ -63,11 +63,11 @@ func GetPosts(pageSize int, pageNum int, username string) []Post {
 //获取某一个帖子
 func GetPost(id int, username string) (Post, int) {
 	var pid int
-	Db.QueryRow("select id from posts where id =?", id).Scan(&pid)
+	_ = Db.QueryRow("select id from posts where id =?", id).Scan(&pid)
 	var post Post
 	if pid == id {
 		row := Db.QueryRow("select id,publishTime,content,pictures,topicId,userId,nickName,praiseCount,commentCount,title from posts where id =?", id)
-		row.Scan(&post.Id, &post.PublishTime, &post.Content, &post.Pictures, &post.TopicId, &post.UserId, &post.NickName, &post.PraiseCount, &post.CommentCount, &post.Title)
+		_ = row.Scan(&post.Id, &post.PublishTime, &post.Content, &post.Pictures, &post.TopicId, &post.UserId, &post.NickName, &post.PraiseCount, &post.CommentCount, &post.Title)
 		if err != nil {
 			return post, errormsg.ERROR_POST_NOTEXIST
 		}
@@ -107,7 +107,6 @@ func IssuePost(data *Post, u *middleware.MyClaim) (int, int) {
 	}
 	result, err := Db.Exec("insert into posts (title,content,topicId,pictures,userId,nickName) values (?,?,?,?,?,?)", data.Title, data.Content, data.TopicId, data.Pictures, data.UserId, data.NickName)
 	if err != nil {
-		fmt.Printf("err is:", err1)
 		return 0, errormsg.ERROR
 	}
 	postId, _ := result.LastInsertId()
@@ -147,7 +146,7 @@ func SearchPost(key string, pageSize int, pageNum int) ([]Post, int) {
 		fmt.Printf("err is:%v\n", err)
 		return posts, errormsg.ERROR_POST_NOTEXIST
 	}
-	var i int = 0
+	var i = 0
 	for rows.Next() {
 		_ = rows.Scan(&posts[i].Id, &posts[i].PublishTime, &posts[i].Content, &posts[i].Pictures, &posts[i].TopicId, &posts[i].UserId, &posts[i].NickName, &posts[i].PraiseCount, &posts[i].CommentCount, &posts[i].Title)
 		i++
