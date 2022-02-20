@@ -130,6 +130,7 @@ func DeletePost(id int, u *middleware.MyClaim) int {
 	var userId int
 	_ = Db.QueryRow("select id from users where username=?", u.Username).Scan(&userId)
 	_, err := Db.Exec("delete from posts where id=? and userId =?", id, userId)
+	_, _ = Db.Exec("delete from comments where postId =?", id) //删除帖子下的评论
 	if err != nil {
 		fmt.Printf("err is:%v\n", err)
 		return errormsg.ERROR
