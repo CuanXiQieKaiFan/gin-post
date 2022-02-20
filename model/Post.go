@@ -62,32 +62,41 @@ func GetPosts(pageSize int, pageNum int, username string) []Post {
 
 //获取某一个帖子
 func GetPost(id int, username string) (Post, int) {
+	var pid int
+	Db.QueryRow("select id from posts where id =?", id).Scan(&pid)
 	var post Post
-	row := Db.QueryRow("select id,publishTime,content,pictures,topicId,userId,nickName,praiseCount,commentCount,title from posts where id =?", id)
-	row.Scan(&post.Id, &post.PublishTime, &post.Content, &post.Pictures, &post.TopicId, &post.UserId, &post.NickName, &post.PraiseCount, &post.CommentCount, &post.Title)
-	if err != nil {
+	if pid == id {
+		row := Db.QueryRow("select id,publishTime,content,pictures,topicId,userId,nickName,praiseCount,commentCount,title from posts where id =?", id)
+		row.Scan(&post.Id, &post.PublishTime, &post.Content, &post.Pictures, &post.TopicId, &post.UserId, &post.NickName, &post.PraiseCount, &post.CommentCount, &post.Title)
+		if err != nil {
+			return post, errormsg.ERROR_POST_NOTEXIST
+		}
+		//取出点赞,收藏列表  判断该查询用户是否点赞收藏。。。
+		var postId, focus string
+		r := Db.QueryRow("select praisePost,focus from users where username=?", username)
+		_ = r.Scan(&postId, &focus)
+		praisePosts := strings.SplitN(postId, " ", -1) //post的id
+		focusId := strings.SplitN(focus, " ", -1)      //post的id
+		for j := 0; j < len(praisePosts)-1; j++ {
+			pid, _ := strconv.Atoi(praisePosts[j])
+			if post.Id == pid {
+				post.IsPraised = true
+			}
+		}
+		for j := 0; j < len(focusId)-1; j++ {
+			fid, _ := strconv.Atoi(focusId[j])
+			if post.Id == fid {
+				post.IsCollect = true
+			}
+		}
+		//写入浏览记录
+		var list string
+		_ = Db.QueryRow("select viewList from users where username=?", username).Scan(&list)
+		_, _ = Db.Exec("update users set viewList=? where username=?", list+strconv.Itoa(id)+" ", username)
+		return post, errormsg.SUCCESS
+	} else {
 		return post, errormsg.ERROR_POST_NOTEXIST
 	}
-
-	//取出点赞,收藏列表
-	var postId, focus string
-	r := Db.QueryRow("select praisePost,focus from users where username=?", username)
-	_ = r.Scan(&postId, &focus)
-	praisePosts := strings.SplitN(postId, " ", -1) //post的id
-	focusId := strings.SplitN(focus, " ", -1)      //post的id
-	for j := 0; j < len(praisePosts)-1; j++ {
-		pid, _ := strconv.Atoi(praisePosts[j])
-		if post.Id == pid {
-			post.IsPraised = true
-		}
-	}
-	for j := 0; j < len(focusId)-1; j++ {
-		fid, _ := strconv.Atoi(focusId[j])
-		if post.Id == fid {
-			post.IsCollect = true
-		}
-	}
-	return post, errormsg.SUCCESS
 }
 
 //发布帖子
@@ -145,7 +154,7 @@ func SearchPost(key string, pageSize int, pageNum int) ([]Post, int) {
 	return posts, errormsg.SUCCESS
 }
 
-//取出帖子
+//取出帖子为更新做准备
 func OutPutPost(id int) Post {
 	var post Post
 	row := Db.QueryRow("select id,publishTime,content,pictures,topicId,userId,nickName,praiseCount,commentCount,title from posts where id =?", id)

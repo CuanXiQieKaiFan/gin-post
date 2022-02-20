@@ -71,3 +71,41 @@ func GetFocus(c *gin.Context) {
 		"collections": users,
 	})
 }
+
+//获取给你点赞的用户列表
+func PraForU(c *gin.Context) {
+	token := c.Request.Header.Get("Authorization")
+	u, _ := middleware.CheckToknen(token)
+	postform := c.PostForm("model")
+	mod, _ := strconv.Atoi(postform)
+	users, code := model.PraForU(u.Username, mod)
+	c.JSON(http.StatusOK, gin.H{
+		"status":     code,
+		"message":    errormsg.GetErrMsg(code),
+		"praiseList": users,
+	})
+}
+
+//获取浏览记录
+func GetViewList(c *gin.Context) {
+	token := c.Request.Header.Get("Authorization")
+	u, _ := middleware.CheckToknen(token)
+	posts, code := model.GetViewList(u.Username)
+	c.JSON(http.StatusOK, gin.H{
+		"status":   code,
+		"message":  errormsg.GetErrMsg(code),
+		"viewList": posts,
+	})
+}
+
+//获取关注你的用户列表
+func FocusForU(c *gin.Context) {
+	token := c.Request.Header.Get("Authorization")
+	u, _ := middleware.CheckToknen(token)
+	userList, code := model.FocusForU(u.Username)
+	c.JSON(http.StatusOK, gin.H{
+		"status":    code,
+		"message":   errormsg.GetErrMsg(code),
+		"focusList": userList,
+	})
+}

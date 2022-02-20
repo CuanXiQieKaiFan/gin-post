@@ -10,21 +10,25 @@ import (
 )
 
 type User struct {
-	ID           int    `json:"id"`
-	Gender       string ` json:"gender"`
-	NickName     string `json:"nickName"`
-	QQ           string `json:"qq"`
-	Birthday     string `json:"birthday"`
-	Email        string `json:"email"`
-	Avatar       string `json:"avatar"`
-	Introduction string `json:"introduction"`
-	Phone        string `json:"phone"`
-	Username     string `json:"username" validate:"required,min=4,max=12"`
-	Password     string `json:"password,omitempty" validate:"required,min=6,max=20"`
-	Collection   string `json:"collection,omitempty"`
-	Focus        string `json:"focus,omitempty"`
-	PraisePost   string `json:"praise_post,omitempty"` //存储点赞的帖子id
-	PraiseCom    string `json:"praise_com,omitempty"`  //存储点赞的评论id
+	ID             int    `json:"id"`
+	Gender         string ` json:"gender"`
+	NickName       string `json:"nickName"`
+	QQ             string `json:"qq"`
+	Birthday       string `json:"birthday"`
+	Email          string `json:"email"`
+	Avatar         string `json:"avatar"`
+	Introduction   string `json:"introduction"`
+	Phone          string `json:"phone"`
+	Username       string `json:"username" validate:"required,min=4,max=12"`
+	Password       string `json:"password,omitempty" validate:"required,min=6,max=20"`
+	Collection     string `json:"collection,omitempty"`
+	Focus          string `json:"focus,omitempty"`
+	PraisePost     string `json:"praise_post,omitempty"`       //存储点赞的帖子id
+	PraiseCom      string `json:"praise_com,omitempty"`        //存储点赞的评论id
+	PraisePostForU string `json:"praise_post_for_u,omitempty"` //存储为你帖子点赞的用户
+	PraiseComForU  string `json:"praise_Com_for_u,omitempty"`  //存储为你评论点赞的用户
+	FocusForU      string `json:"focus_for_u,omitempty"`       //存储关注你的用户列表
+	Viewlist       string `json:"viewlist,omitempty"`          //浏览记录
 }
 
 //刷新token
