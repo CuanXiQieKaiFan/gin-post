@@ -39,6 +39,8 @@ func Start() {
 	r.POST("topic/create", api.CreateTopic) //创建主题
 	r.GET("/topic/list", api.GetTopics)     //获取所有主题
 
+	r.POST("/upload", api.UploadFile) //上传文件/照片
+
 	others := r.Group("/operate") //其他操作 收藏点赞
 	{
 		others.PUT("/praise", api.Praise)              //点赞
