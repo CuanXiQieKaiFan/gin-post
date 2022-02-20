@@ -48,7 +48,7 @@ func Start() {
 		others.PUT("/focus", api.Focus)                //关注
 		others.GET("/praise/toyou", api.PraForU)       //获取为我点赞的用户列表
 		others.GET("/view/list", api.GetViewList)      //获取浏览记录
-		others.GET("/focus/onyou", api.FocusForU)      //获取浏览记录
+		others.GET("/focus/onyou", api.FocusForU)      //获取关注我的用户列表
 	}
 
 	_ = r.Run(":9090")
